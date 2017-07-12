@@ -3,7 +3,7 @@ package org.renci.scidas.constants;
 public class Constants {
 	
 	// Strings
-	public static final String SEMICOLON = ",";
+	public static final String COMMA = ",";
 	public static final String AMPERSEND = "&";
 	
 	// Integers

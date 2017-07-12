@@ -17,10 +17,11 @@ public class RequestBodyParserHelper {
 	public static final Logger LOG = Logger.getLogger(RequestBodyParserHelper.class);
 
 	public DataSetAndOffers convertDataSetAndOffersRequestToPOJO(DataSetAndOffersRequest request) {
-		DataSetAndOffers result = new DataSetAndOffers();
+		DataSetAndOffers result = null;
 		try {
-			if (request.getSourceDataSites().contains(Constants.SEMICOLON)) {
-				List<String> listOfSources = Arrays.asList(request.getSourceDataSites().split(Constants.SEMICOLON));
+			result = new DataSetAndOffers();
+			if (request.getSourceDataSites().contains(Constants.COMMA)) {
+				List<String> listOfSources = Arrays.asList(request.getSourceDataSites().split(Constants.COMMA));
 				result.setSources(listOfSources);
 			} else if (request.getSourceDataSites().length() == 0) {
 				result.setSources(null);
@@ -29,8 +30,8 @@ public class RequestBodyParserHelper {
 				result.setSources(listOfSources);
 			}
 			
-			if (request.getOffers().contains(Constants.SEMICOLON)) {
-				List<String> listOfDestinations = Arrays.asList(request.getOffers().split(Constants.SEMICOLON));
+			if (request.getOffers().contains(Constants.COMMA)) {
+				List<String> listOfDestinations = Arrays.asList(request.getOffers().split(Constants.COMMA));
 				result.setDestinations(listOfDestinations);
 			} else if (request.getOffers().length() == 0) {
 				result.setDestinations(null);
