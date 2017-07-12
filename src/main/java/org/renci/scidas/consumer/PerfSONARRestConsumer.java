@@ -1,11 +1,19 @@
 package org.renci.scidas.consumer;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.ws.rs.core.MediaType;
 
 import org.apache.log4j.Logger;
+import org.renci.scidas.pojo.ThroughputDataJSON;
+import org.renci.scidas.pojo.ThroughputEvent;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.CollectionType;
+import com.fasterxml.jackson.databind.type.TypeFactory;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
@@ -13,20 +21,48 @@ import com.sun.jersey.api.client.WebResource;
 @Configuration
 @Qualifier("PerfSONARRestConsumer")
 public class PerfSONARRestConsumer {
-	
+
 	public static final Logger LOG = Logger.getLogger(PerfSONARRestConsumer.class);
-	public static final String URI = "http://139.62.242.122/esmond/perfsonar/archive/?event-type=throughput";
 	
-	public String getThroughput() {
-		String result = "";
+	public ThroughputEvent getURIFromThroughput(String uri) {
+		ThroughputEvent result;
 		try {
 			Client client = Client.create();
-			WebResource webResource = client.resource(URI);
-			ClientResponse response = webResource.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
-			
-			result = response.getEntity(String.class);
+			WebResource webResource = client.resource(uri);
+			ClientResponse response = webResource.accept(MediaType.APPLICATION_JSON)
+					.get(ClientResponse.class);
+
+			String jsonString = response.getEntity(String.class);
+			ObjectMapper mapper = new ObjectMapper();
+			TypeFactory typeFactory = mapper.getTypeFactory();
+			CollectionType collectionType = typeFactory.constructCollectionType(List.class, 
+					ThroughputEvent.class);
+			List<ThroughputEvent> list = mapper.readValue(jsonString, collectionType);
+			result = list.get(0);
 		} catch (Exception e) {
-			LOG.error("Exception while consuming the throughput information", e);
+			LOG.error("Exception while consuming the endpoint URI from throughput test", e);
+			result = new ThroughputEvent();
+		}
+		return result;
+	}
+	
+	public List<ThroughputDataJSON> getURIForThroughputData(String uri) {
+		List<ThroughputDataJSON> result;
+		try {
+			Client client = Client.create();
+			WebResource webResource = client.resource(uri);
+			ClientResponse response = webResource.accept(MediaType.APPLICATION_JSON)
+					.get(ClientResponse.class);
+
+			String jsonString = response.getEntity(String.class);
+			ObjectMapper mapper = new ObjectMapper();
+			TypeFactory typeFactory = mapper.getTypeFactory();
+			CollectionType collectionType = typeFactory.constructCollectionType(List.class, 
+					ThroughputDataJSON.class);
+			result = mapper.readValue(jsonString, collectionType);
+		} catch (Exception e) {
+			LOG.error("Exception while consuming the endpoint URI from throughput test", e);
+			result = new ArrayList<ThroughputDataJSON>();
 		}
 		return result;
 	}
