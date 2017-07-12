@@ -31,6 +31,13 @@ public class MainController {
 	@Qualifier("NetworkOptimizerServiceProcessor")
 	public NetworkOptimizerServiceProcessor networkOptimizerServiceProcessor;
 	
+	/*@RequestMapping(value = "/test", method = RequestMethod.GET)
+	@Produces("application/json")
+	@ResponseBody
+	public String test() {
+		return "Test";
+	}*/
+	
 	@RequestMapping(value = "/networkOptimizer", method = RequestMethod.POST)
 	@Consumes("application/json")
 	@Produces("application/json")

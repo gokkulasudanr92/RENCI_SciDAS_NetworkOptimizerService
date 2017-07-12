@@ -19,23 +19,23 @@ public class RequestBodyParserHelper {
 	public DataSetAndOffers convertDataSetAndOffersRequestToPOJO(DataSetAndOffersRequest request) {
 		DataSetAndOffers result = new DataSetAndOffers();
 		try {
-			if (request.getSources().contains(Constants.SEMICOLON)) {
-				List<String> listOfSources = Arrays.asList(request.getSources().split(Constants.SEMICOLON));
+			if (request.getSourceDataSites().contains(Constants.SEMICOLON)) {
+				List<String> listOfSources = Arrays.asList(request.getSourceDataSites().split(Constants.SEMICOLON));
 				result.setSources(listOfSources);
-			} else if (request.getSources().length() == 0) {
+			} else if (request.getSourceDataSites().length() == 0) {
 				result.setSources(null);
 			} else {
-				List<String> listOfSources = Arrays.asList(request.getSources());
+				List<String> listOfSources = Arrays.asList(request.getSourceDataSites());
 				result.setSources(listOfSources);
 			}
 			
-			if (request.getDestinations().contains(Constants.SEMICOLON)) {
-				List<String> listOfDestinations = Arrays.asList(request.getDestinations().split(Constants.SEMICOLON));
+			if (request.getOffers().contains(Constants.SEMICOLON)) {
+				List<String> listOfDestinations = Arrays.asList(request.getOffers().split(Constants.SEMICOLON));
 				result.setDestinations(listOfDestinations);
-			} else if (request.getDestinations().length() == 0) {
+			} else if (request.getOffers().length() == 0) {
 				result.setDestinations(null);
 			} else {
-				List<String> listOfDestinations = Arrays.asList(request.getDestinations());
+				List<String> listOfDestinations = Arrays.asList(request.getOffers());
 				result.setDestinations(listOfDestinations);
 			}
 		} catch (Exception e) {

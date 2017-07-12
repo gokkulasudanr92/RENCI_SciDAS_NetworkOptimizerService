@@ -2,23 +2,23 @@ package org.renci.scidas.pojo;
 
 public class DataSetAndOffersRequest {
 	
-	public String sources;
-	public String destinations;
+	public String sourceDataSites;
+	public String offers;
 
-	public String getSources() {
-		return sources;
+	public String getSourceDataSites() {
+		return sourceDataSites;
 	}
 
-	public void setSources(String sources) {
-		this.sources = sources;
+	public void setSourceDataSites(String sources) {
+		this.sourceDataSites = sources;
 	}
 
-	public String getDestinations() {
-		return destinations;
+	public String getOffers() {
+		return offers;
 	}
 
-	public void setDestinations(String destinations) {
-		this.destinations = destinations;
+	public void setOffers(String destinations) {
+		this.offers = destinations;
 	}
 
 }

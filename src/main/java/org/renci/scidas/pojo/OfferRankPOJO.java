@@ -4,23 +4,23 @@ import java.util.List;
 
 public class OfferRankPOJO {
 	
-	public String sourceOffer;
-	public List<ThroughputDataPOJO> destinationOffers;
+	public String sourceDataSite;
+	public List<ThroughputDataPOJO> offers;
 
-	public String getSourceOffer() {
-		return sourceOffer;
+	public String getSourceDataSite() {
+		return sourceDataSite;
 	}
 
-	public void setSourceOffer(String sourceOffer) {
-		this.sourceOffer = sourceOffer;
+	public void setSourceDataSite(String sourceOffer) {
+		this.sourceDataSite = sourceOffer;
 	}
 
-	public List<ThroughputDataPOJO> getDestinationOffers() {
-		return destinationOffers;
+	public List<ThroughputDataPOJO> getOffers() {
+		return offers;
 	}
 
-	public void setDestinationOffers(List<ThroughputDataPOJO> destinationOffers) {
-		this.destinationOffers = destinationOffers;
+	public void setOffers(List<ThroughputDataPOJO> destinationOffers) {
+		this.offers = destinationOffers;
 	}
 
 }
