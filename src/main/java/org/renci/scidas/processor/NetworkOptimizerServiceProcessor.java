@@ -108,13 +108,6 @@ public class NetworkOptimizerServiceProcessor {
 				}
 			}
 
-			// Test part
-			ThroughputDataPOJO test = new ThroughputDataPOJO();
-			test.setOffer("172.16.100.5");
-			test.setDestination("172.16.100.5");
-			test.setValue(result.getOffers().get(0).getValue() - 50000L);
-			result.getOffers().add(test);
-
 			Collections.sort(result.getOffers());
 		} catch (Exception e) {
 			LOG.error("Exception while executing single data site logic algorithm", e);
