@@ -11,7 +11,7 @@ public class ConstructURIHelper {
 	
 	public static final Logger LOG = Logger.getLogger(ConstructURIHelper.class);
 	public static final String PROTOCOL = "http://";
-	public static final String ENDPOINT = "xxx.xxx.xxx.xxx"; 
+	public static final String ENDPOINT = "139.62.242.122"; 
 		// This should be ideally source of dataset but for the time being it is being harcoded
 	public static final String ARCHIVE_PART = "/esmond/perfsonar/archive/?";
 	public static final String SOURCE_PART = "source=";
