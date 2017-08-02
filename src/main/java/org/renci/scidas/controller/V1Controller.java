@@ -4,6 +4,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 
 import org.apache.log4j.Logger;
+import org.renci.scidas.consumer.ShellConsumer;
 import org.renci.scidas.helper.RequestBodyParserHelper;
 import org.renci.scidas.pojo.DataSetAndOffers;
 import org.renci.scidas.pojo.DataSetAndOffersRequest;
@@ -18,10 +19,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
-@RequestMapping("/")
-public class MainController {
+@RequestMapping("/v1/")
+public class V1Controller {
 	
-	public static final Logger LOG = Logger.getLogger(MainController.class);
+	public static final Logger LOG = Logger.getLogger(V1Controller.class);
 	
 	@Autowired
 	@Qualifier("RequestBodyParserHelper")
@@ -30,6 +31,17 @@ public class MainController {
 	@Autowired
 	@Qualifier("NetworkOptimizerServiceProcessor")
 	public NetworkOptimizerServiceProcessor networkOptimizerServiceProcessor;
+	
+	@Autowired
+	@Qualifier("ShellConsumer")
+	ShellConsumer shellConsumer;
+	
+	@RequestMapping(value = "/test", method = RequestMethod.GET)
+	@ResponseBody
+	public String test() {
+		shellConsumer.irodsDomainIdentifier();
+		return "This is a test api";
+	}
 	
 	@RequestMapping(value = "/networkOptimizer", method = RequestMethod.POST)
 	@Consumes("application/json")
