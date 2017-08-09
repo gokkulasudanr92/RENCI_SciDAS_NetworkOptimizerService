@@ -22,6 +22,7 @@
 		<property name="messageConverters">
 			<list>
 				<ref bean="jsonMessageConverter" />
+				<ref bean="protobufMessageConverter" />
 			</list>
 		</property>
 	</bean>
@@ -29,5 +30,8 @@
 	<!-- Configure bean to convert JSON to POJO and vice versa -->
 	<bean id="jsonMessageConverter"
 		class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter" />
+		
+	<bean id="protobufMessageConverter"
+		class="org.springframework.http.converter.protobuf.ProtobufHttpMessageConverter" />
 
 </beans>

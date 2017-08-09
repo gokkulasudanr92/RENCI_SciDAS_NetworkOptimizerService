@@ -4,6 +4,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 
 import org.apache.log4j.Logger;
+import org.apache.mesos.v1.scheduler.Protos;
 import org.renci.scidas.consumer.ShellConsumer;
 import org.renci.scidas.helper.RequestBodyParserHelper;
 import org.renci.scidas.pojo.DataSetAndOffers;
@@ -57,6 +58,13 @@ public class V1Controller {
 			LOG.error("Exception while Micro Service API POST Call for network optimization", e);
 		}
 		return result;
+	}
+	
+	@RequestMapping(value = "/test2", method = RequestMethod.GET)
+	@Produces("application/x-protobuf")
+	@ResponseBody
+	public Protos.Event.Offers test2() {
+		return null;
 	}
 	
 }
