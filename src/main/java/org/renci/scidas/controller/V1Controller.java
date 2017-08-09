@@ -4,7 +4,6 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 
 import org.apache.log4j.Logger;
-import org.apache.mesos.v1.scheduler.Protos;
 import org.renci.scidas.consumer.ShellConsumer;
 import org.renci.scidas.helper.RequestBodyParserHelper;
 import org.renci.scidas.pojo.DataSetAndOffers;
@@ -13,11 +12,13 @@ import org.renci.scidas.pojo.OfferRankPOJO;
 import org.renci.scidas.processor.NetworkOptimizerServiceProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.test.tutorial.AddressBookProtos;
 
 @Controller
 @RequestMapping("/v1/")
@@ -60,11 +61,18 @@ public class V1Controller {
 		return result;
 	}
 	
-	@RequestMapping(value = "/test2", method = RequestMethod.GET)
-	@Produces("application/x-protobuf")
+	@RequestMapping(value = "/test2", method = RequestMethod.GET, 
+			produces = { MediaType.APPLICATION_OCTET_STREAM_VALUE, "application/x-protobuf" })
 	@ResponseBody
-	public Protos.Event.Offers test2() {
-		return null;
+	public AddressBookProtos.Person test2() {
+		return AddressBookProtos.Person.newBuilder()
+                .setId(1)
+                .setName("Sam")
+                .setEmail("sam@sampullara.com")
+                .addPhone(AddressBookProtos.Person.PhoneNumber.newBuilder()
+                        .setNumber("415-555-1212")
+                        .setType(AddressBookProtos.Person.PhoneType.MOBILE)
+                        .build())
+                .build();
 	}
-	
 }
