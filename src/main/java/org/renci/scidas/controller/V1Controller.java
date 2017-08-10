@@ -39,7 +39,7 @@ public class V1Controller {
 	 * @param request
 	 * @return
 	 */
-	@RequestMapping(value = "/networkOptimizer", method = RequestMethod.POST)
+	@RequestMapping(value = "/microservice", method = RequestMethod.POST)
 	@Consumes("application/json")
 	@Produces("application/json")
 	@ResponseBody
@@ -60,7 +60,7 @@ public class V1Controller {
 	 * @param event
 	 * @return
 	 */
-	@RequestMapping(value = "/microservice", method = RequestMethod.POST,
+	@RequestMapping(value = "/microserviceforprotobuf", method = RequestMethod.POST,
 			consumes = "application/x-protobuf", produces = "application/x-protobuf")
 	public Event microServiceAPIForProtobuf(@RequestBody Event event) {
 		LOG.info("Micro Service API POST Calll for network optimization");

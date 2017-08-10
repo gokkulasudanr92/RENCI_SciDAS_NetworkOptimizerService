@@ -4,9 +4,9 @@ The main goal of the project is to optimize the network throughput between the c
 
 ## Environment
 The micro service is build on the following tools:
-	* Maven
-	* Spring 4 MVC
-	* Google Protobuf
+* Maven
+* Spring 4 MVC
+* Google Protobuf
 
 The spring framework is different from java servlets that all the request calls reach the application through Dispatcher Servlet. The Dispatcher Servlet is configured in the `web.xml` file by using the following code snippet: 
 ```xml
@@ -90,3 +90,18 @@ The `ShellConsumer` class is used to remote login to a resource using the JSch J
 ## Logging
 The application logging is done with the help of `Apache Log4j` library. The log configuration was defined at the `log4j.properties` file located at `src/main/resources`. The log4j.properties file defines logging as console message and also as file log.
 
+## Code Structure
+### 1. org.renci.scidas.controller
+This package contains the `V1Controller.java` file which is responsible contains the RESTful definition of how to invoke the micro service. Note: The URI call to invoke the service when the server is up is `http://<server-ip>:8181/<root-context>/v1/microserviceforprotobuf`.
+### 2. org.renci.scidas.consumer
+This package contains the `PerfSONARRestConsumer.java` and `ShellConsumer.java` files. The first file contains the methods which is responsible for calling perfSONAR host and consolidating the results. The second file contains the methods required to identify the perfSONAR host from TaskInfo message from the protobuf.
+### 3. org.renci.scidas.processor
+This package contains the main business logic of the micro service. The `NetworkOptimizerServiceProcessor.java` file contains all the methods which defines the business logic of the service and also methods which transforms the result to proto Event message.
+### 4. org.renci.scidas.pojo
+This package contains a list of singleton classes.
+### 5. org.renci.scidas.helper
+This package contains helper methods to process request, construct uri and file locator.
+### 6. org.renci.scidas.constants
+This package defines all the fixed constants used within the project.
+### 7. src/generated/java
+This source folder contains all the generated java files corresponding to the definition of `.proto` files.
