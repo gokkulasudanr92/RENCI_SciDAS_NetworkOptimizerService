@@ -105,3 +105,6 @@ This package contains helper methods to process request, construct uri and file 
 This package defines all the fixed constants used within the project.
 #### 7. src/generated/java
 This source folder contains all the generated java files corresponding to the definition of `.proto` files.
+
+## Build & Deploy
+This is an Eclipse "Maven Project". To build this application, execute the maven build with options `clean install -U`. To deploy this application, place the `.war` file generated from previous build at the tomcat's `webapps` folder. (Note: In eclipse, link the tomcat server to the project).
