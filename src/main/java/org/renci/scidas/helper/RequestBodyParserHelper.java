@@ -1,12 +1,19 @@
 package org.renci.scidas.helper;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.apache.mesos.v1.Protos.Offer;
+import org.apache.mesos.v1.scheduler.Protos;
 import org.renci.scidas.constants.Constants;
+import org.renci.scidas.consumer.ShellConsumer;
 import org.renci.scidas.pojo.DataSetAndOffers;
+import org.renci.scidas.pojo.DataSetAndOffersForProtobuf;
 import org.renci.scidas.pojo.DataSetAndOffersRequest;
+import org.renci.scidas.pojo.DestinationObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
 
@@ -15,6 +22,9 @@ import org.springframework.context.annotation.Configuration;
 public class RequestBodyParserHelper {
 
 	public static final Logger LOG = Logger.getLogger(RequestBodyParserHelper.class);
+	
+	@Autowired
+	ShellConsumer shellConsumer;
 
 	public DataSetAndOffers convertDataSetAndOffersRequestToPOJO(DataSetAndOffersRequest request) {
 		DataSetAndOffers result = null;
@@ -41,6 +51,46 @@ public class RequestBodyParserHelper {
 			}
 		} catch (Exception e) {
 			LOG.error("Exception while converting the Data Set Request to POJO", e);
+		}
+		return result;
+	}
+	
+	public DataSetAndOffersForProtobuf convertEventOfferstoPOJO(Protos.Event event) {
+		DataSetAndOffersForProtobuf result = null;
+		LOG.info("Method to convert Event request to POJO");
+		try {
+			result = new DataSetAndOffersForProtobuf();
+			
+			// The Sources of the data site is to be queried from
+			// IRODS Server, The ShellConsumer class helps to query
+			// and identify the data site
+			/*
+			 * 
+			 * Part of the code to update the sourceDataSites
+			 * to DataSetAndOffers Object
+			 * 
+			 */
+			
+			for(Offer offer: event.getOffers().getOffersList()) {
+				String agentIP = offer.getHostname();
+				// An method call is needed here which interacts 
+				// with a reverse mapping of (agent ip to master ip) 
+				// and identify the master ips
+				//
+				// Note: For the time being I am adding the agent ip to the 
+				// 		 destination list
+				if(agentIP.length() != 0) {
+					if (result.getDestinations() == null) {
+						result.setDestinations(new ArrayList<DestinationObject>());
+					}
+					DestinationObject temp = new DestinationObject();
+					temp.setAgentIp(agentIP);
+					temp.setMasterIp(agentIP);
+					result.getDestinations().add(temp);
+				}
+			}
+		} catch (Exception e) {
+			LOG.error("Exception while converting to POJO", e);
 		}
 		return result;
 	}
