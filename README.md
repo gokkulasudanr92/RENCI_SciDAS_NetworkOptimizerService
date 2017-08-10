@@ -38,7 +38,7 @@ Maven is a tool which is used to include dependencies for our project. The `pom.
 	</configuration>
 </plugin>
 ```
-* maven-protoc-plugin - This is used to generate the corresponding Java files for the `.proto` definition files. The `.proto` files are defined here as per the [MesoCordinator Repository] (https://github.com/SciDAS/MesosCoordinator). The maven build generates the Java files at `src/generated/java` location.(Note: `src/generated/java` should be added to the java build path). The protoc location should be defined in the plugin configuration with the help of `<protocExecutable>` tag.
+* maven-protoc-plugin - This is used to generate the corresponding Java files for the `.proto` definition files. The `.proto` files are defined here as per the [MesoCordinator Repository](https://github.com/SciDAS/MesosCoordinator). The maven build generates the Java files at `src/generated/java` location.(Note: `src/generated/java` should be added to the java build path). The protoc location should be defined in the plugin configuration with the help of `<protocExecutable>` tag.
 ```xml
 <plugin>
 	<groupId>com.google.protobuf.tools</groupId>
