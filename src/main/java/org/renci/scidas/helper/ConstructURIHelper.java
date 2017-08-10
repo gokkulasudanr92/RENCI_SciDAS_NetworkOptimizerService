@@ -11,8 +11,6 @@ public class ConstructURIHelper {
 	
 	public static final Logger LOG = Logger.getLogger(ConstructURIHelper.class);
 	public static final String PROTOCOL = "http://";
-	public static final String ENDPOINT = "131.94.144.11"; 
-		// This should be ideally source of dataset but for the time being it is being harcoded
 	public static final String ARCHIVE_PART = "/esmond/perfsonar/archive/?";
 	public static final String SOURCE_PART = "source=";
 	public static final String DESTINATION_PART = "destination=";
@@ -21,7 +19,14 @@ public class ConstructURIHelper {
 	public static final String TIME_RANGE_PART = "time-range=";
 	public static final String START_TIME_PART = "time-start=";
 	
-	
+	/**
+	 * Method to construct the URI to make the call to perfSONAR
+	 * This obtains the base-uri from perfSONAR which is needed
+	 * to get the throughput value.
+	 * @param source
+	 * @param destination
+	 * @return
+	 */
 	public String constructPerfSONARUriForThroughputEvent(String source, String destination) {
 		LOG.info("Helper method to construct the perfSONAR URI for Throughput Event");
 		String result = "";
@@ -35,7 +40,7 @@ public class ConstructURIHelper {
 			}
 			
 			result += PROTOCOL;
-			result += ENDPOINT;
+			result += source; // This should be the perfSONAR IP
 			result += ARCHIVE_PART;
 			result += SOURCE_PART + source + Constants.AMPERSEND;
 			result += DESTINATION_PART + destination + Constants.AMPERSEND;
@@ -46,6 +51,13 @@ public class ConstructURIHelper {
 		return result;
 	}
 	
+	/**
+	 * Method call to construct the base uri to make 
+	 * a call to perfSONAR.
+	 * @param source
+	 * @param baseUri
+	 * @return
+	 */
 	public String constructPerfSONARUriForThroughputData(String source, String baseUri) {
 		LOG.info("Helper method to construct the perfSONAR URI for Throughput data");
 		String result = "";
@@ -60,7 +72,7 @@ public class ConstructURIHelper {
 			}
 			
 			result += PROTOCOL;
-			result += ENDPOINT; // It should be source
+			result += source; // This should be the perfSONAR IP
 			result += baseUri;
 			result += THROUGHPUT_PART;
 			result += TIME_RANGE_PART + Constants.TIME_IN_HOURS + Constants.AMPERSEND;

@@ -4,6 +4,7 @@ import java.io.InputStream;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
+import org.apache.mesos.v1.scheduler.Protos.Event;
 import org.renci.scidas.helper.PropertyHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -24,11 +25,27 @@ public class ShellConsumer {
 	@Qualifier("PropertyHelper")
 	PropertyHelper propertyHelper;
 	
+	// Update the IRODS SERVER URL Accordingly
 	public static String IRODS_SERVER_HOST = "139.62.242.18";
+	// Update the IRODS SERVER USER Accordingly
 	public static String IRODS_SERVER_USER = "root";
+	// Update the list of IROD Commands that needs 
+	// to be executed to identify the perfSONAR IP
 	public static String COMMAND_1 = "ls -l /";
 	
-	public void irodsDomainIdentifier() {
+	/**
+	 * Method call to identify the perfSONAR IP of the corresponding DTN
+	 * @param event
+	 */
+	public void irodsDomainIdentifier(Event event) {
+		/*
+		 * 
+		 * Event Object of the protobuf message needs to be defined
+		 * with TaskInfo object. The TaskInfo object holds information
+		 * about the data set location. This needs to be used to identify
+		 * the DTN location where perfSONAR will be recording metrics. 
+		 * 
+		 */
 		LOG.info("Consumer method to identify domain for file using IRODS");
 		try {
 			JSch jsch = new JSch();

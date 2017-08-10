@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.apache.mesos.v1.Protos.Offer;
-import org.apache.mesos.v1.scheduler.Protos;
+import org.apache.mesos.v1.scheduler.Protos.Event;
 import org.renci.scidas.constants.Constants;
 import org.renci.scidas.consumer.ShellConsumer;
 import org.renci.scidas.pojo.DataSetAndOffers;
@@ -24,8 +24,15 @@ public class RequestBodyParserHelper {
 	public static final Logger LOG = Logger.getLogger(RequestBodyParserHelper.class);
 	
 	@Autowired
+	@Qualifier("ShellConsumer")
 	ShellConsumer shellConsumer;
 
+	/**
+	 * Method to convert the request parameter to
+	 * help in processing
+	 * @param request
+	 * @return
+	 */
 	public DataSetAndOffers convertDataSetAndOffersRequestToPOJO(DataSetAndOffersRequest request) {
 		DataSetAndOffers result = null;
 		try {
@@ -55,7 +62,13 @@ public class RequestBodyParserHelper {
 		return result;
 	}
 	
-	public DataSetAndOffersForProtobuf convertEventOfferstoPOJO(Protos.Event event) {
+	/**
+	 * Method to convert the request parameter to
+	 * identify the data set source and offer destinations
+	 * @param event
+	 * @return
+	 */
+	public DataSetAndOffersForProtobuf convertEventOfferstoPOJO(Event event) {
 		DataSetAndOffersForProtobuf result = null;
 		LOG.info("Method to convert Event request to POJO");
 		try {

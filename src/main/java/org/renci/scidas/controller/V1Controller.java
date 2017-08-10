@@ -4,7 +4,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 
 import org.apache.log4j.Logger;
-import org.apache.mesos.v1.scheduler.Protos;
+import org.apache.mesos.v1.scheduler.Protos.Event;
 import org.renci.scidas.helper.RequestBodyParserHelper;
 import org.renci.scidas.pojo.DataSetAndOffers;
 import org.renci.scidas.pojo.DataSetAndOffersForProtobuf;
@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.test.tutorial.AddressBookProtos;
 
 @Controller
 @RequestMapping("/v1/")
@@ -35,6 +34,11 @@ public class V1Controller {
 	@Qualifier("NetworkOptimizerServiceProcessor")
 	public NetworkOptimizerServiceProcessor networkOptimizerServiceProcessor;
 	
+	/**
+	 * Controller call for micro service API (JSON)
+	 * @param request
+	 * @return
+	 */
 	@RequestMapping(value = "/networkOptimizer", method = RequestMethod.POST)
 	@Consumes("application/json")
 	@Produces("application/json")
@@ -51,9 +55,14 @@ public class V1Controller {
 		return result;
 	}
 	
+	/**
+	 * Controller call for micro service API (Protobuf)
+	 * @param event
+	 * @return
+	 */
 	@RequestMapping(value = "/microservice", method = RequestMethod.POST,
 			consumes = "application/x-protobuf", produces = "application/x-protobuf")
-	public Protos.Event microServiceAPIForProtobuf(@RequestBody Protos.Event event) {
+	public Event microServiceAPIForProtobuf(@RequestBody Event event) {
 		LOG.info("Micro Service API POST Calll for network optimization");
 		try {
 			DataSetAndOffersForProtobuf refinedRequest = requestBodyParserHelper.convertEventOfferstoPOJO(event);
@@ -71,18 +80,4 @@ public class V1Controller {
 		return event;
 	}
 	
-	@RequestMapping(value = "/test2", method = RequestMethod.GET, 
-			produces = "application/x-protobuf" )
-	@ResponseBody
-	public AddressBookProtos.Person test2() {
-		return AddressBookProtos.Person.newBuilder()
-                .setId(1)
-                .setName("Sam")
-                .setEmail("sam@sampullara.com")
-                .addPhone(AddressBookProtos.Person.PhoneNumber.newBuilder()
-                        .setNumber("415-555-1212")
-                        .setType(AddressBookProtos.Person.PhoneType.MOBILE)
-                        .build())
-                .build();
-	}
 }

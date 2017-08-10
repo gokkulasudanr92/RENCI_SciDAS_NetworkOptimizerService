@@ -24,6 +24,11 @@ public class PerfSONARRestConsumer {
 
 	public static final Logger LOG = Logger.getLogger(PerfSONARRestConsumer.class);
 	
+	/**
+	 * Jersey Consumer Method call to perfSONAR
+	 * @param uri
+	 * @return
+	 */
 	public ThroughputEvent getURIFromThroughput(String uri) {
 		ThroughputEvent result;
 		try {
@@ -46,6 +51,11 @@ public class PerfSONARRestConsumer {
 		return result;
 	}
 	
+	/**
+	 * Jersey Consumer Method call to perfSONAR
+	 * @param uri
+	 * @return
+	 */
 	public List<ThroughputDataJSON> getURIForThroughputData(String uri) {
 		List<ThroughputDataJSON> result;
 		try {
