@@ -106,5 +106,54 @@ This package defines all the fixed constants used within the project.
 #### 7. src/generated/java
 This source folder contains all the generated java files corresponding to the definition of `.proto` files.
 
+## PerfSONAR Documentation
+The perfSONAR is a tool which is used to run monitoring tests across different resources. It is also possible to run networking metrics across resources through perfSONAR. The main network test we are focusing on is throughput between resources. The perfSONAR runs the network throughput test with the help of `bwctl` command (a wrapper around `iperf3` command). The perfSONAR makes use of pScheduler to maintain its scheduler. At the back-end, it makes use of MySQL database to record the test results. The `org.renci.scidas.consumer` package of the application contains the `PerfSONARRestConsumer` class where it makes REST calls to perfSONAR to get the test results. The perfSONAR REST URI has 2 phases to retrieve throughput data. The first step is to retrieve the uri from where we can retrieve the test data and the second step is to retrieve the test data.
+
+#### * First Step - Retrieving Base URI
+The first step is basically a call to get the test information details. The uri for the REST call will look like this `http://131.94.144.11/esmond/perfsonar/archive/?source=131.94.144.11&destination=139.62.242.17&event-type=throughput`. This call gives information about the throughput test setup between the `131.94.144.11` and `139.62.242.17`. The corresponding code snippet for this call is as follows:
+```java
+public ThroughputEvent getURIFromThroughput(String uri) {
+	ThroughputEvent result = null;
+	try {
+		Client client = Client.create();
+		WebResource webResource = client.resource(uri);
+		ClientResponse response = webResource.accept(MediaType.APPLICATION_JSON)
+				.get(ClientResponse.class);
+		String jsonString = response.getEntity(String.class);
+		ObjectMapper mapper = new ObjectMapper();
+		TypeFactory typeFactory = mapper.getTypeFactory();
+		CollectionType collectionType = typeFactory.constructCollectionType(List.class, 
+				ThroughputEvent.class);
+		List<ThroughputEvent> list = mapper.readValue(jsonString, collectionType);
+		result = list.get(0);
+	} catch (Exception e) {
+		LOG.error("Exception while consuming the endpoint URI from throughput test", e);
+	}
+	return result;
+}
+```
+#### * Second Step - Retrieving Test Data
+The URI retrieved from the previous step gives use the base uri required to retrieve the test data. The uri REST call will look like this `http://131.94.144.11/esmond/perfsonar/archive/31e5300f1d0140e0a37df7f9585b98f9/throughput/base?time-range=86400&time-start=<time_in_millis>`. The code snippet below will give a walk through about how it is made with `Jersey Client`:
+```java
+public List<ThroughputDataJSON> getURIForThroughputData(String uri) {
+	List<ThroughputDataJSON> result = null;
+	try {
+		Client client = Client.create();
+		WebResource webResource = client.resource(uri);
+		ClientResponse response = webResource.accept(MediaType.APPLICATION_JSON)
+				.get(ClientResponse.class);
+		String jsonString = response.getEntity(String.class);
+		ObjectMapper mapper = new ObjectMapper();
+		TypeFactory typeFactory = mapper.getTypeFactory();
+		CollectionType collectionType = typeFactory.constructCollectionType(List.class, 
+				ThroughputDataJSON.class);
+		result = mapper.readValue(jsonString, collectionType);
+	} catch (Exception e) {
+		LOG.error("Exception while consuming the endpoint URI from throughput test", e);
+	}
+	return result;
+}
+```
+
 ## Build & Deploy
 This is an Eclipse "Maven Project". To build this application, execute the maven build with options `clean install -U`. To deploy this application, place the `.war` file generated from previous build at the tomcat's `webapps` folder. (Note: In eclipse, link the tomcat server to the project).

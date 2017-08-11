@@ -1,6 +1,5 @@
 package org.renci.scidas.consumer;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.core.MediaType;
@@ -30,7 +29,7 @@ public class PerfSONARRestConsumer {
 	 * @return
 	 */
 	public ThroughputEvent getURIFromThroughput(String uri) {
-		ThroughputEvent result;
+		ThroughputEvent result = null;
 		try {
 			Client client = Client.create();
 			WebResource webResource = client.resource(uri);
@@ -46,7 +45,6 @@ public class PerfSONARRestConsumer {
 			result = list.get(0);
 		} catch (Exception e) {
 			LOG.error("Exception while consuming the endpoint URI from throughput test", e);
-			result = new ThroughputEvent();
 		}
 		return result;
 	}
@@ -57,7 +55,7 @@ public class PerfSONARRestConsumer {
 	 * @return
 	 */
 	public List<ThroughputDataJSON> getURIForThroughputData(String uri) {
-		List<ThroughputDataJSON> result;
+		List<ThroughputDataJSON> result = null;
 		try {
 			Client client = Client.create();
 			WebResource webResource = client.resource(uri);
@@ -72,7 +70,6 @@ public class PerfSONARRestConsumer {
 			result = mapper.readValue(jsonString, collectionType);
 		} catch (Exception e) {
 			LOG.error("Exception while consuming the endpoint URI from throughput test", e);
-			result = new ArrayList<ThroughputDataJSON>();
 		}
 		return result;
 	}
