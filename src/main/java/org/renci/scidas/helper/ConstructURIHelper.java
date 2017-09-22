@@ -40,11 +40,13 @@ public class ConstructURIHelper {
 			}
 			
 			result += PROTOCOL;
-			result += source; // This should be the perfSONAR IP
+			//result += source; // This should be the perfSONAR IP
+			result += "147.72.248.7";
 			result += ARCHIVE_PART;
 			result += SOURCE_PART + source + Constants.AMPERSEND;
 			result += DESTINATION_PART + destination + Constants.AMPERSEND;
 			result += EVENT_TYPE_PART;
+			System.out.println(result);
 		} catch (Exception e) {
 			LOG.error("Exceptoin while constructing perfSONAR URI for obtaining Throughput event", e);
 		}
@@ -72,7 +74,8 @@ public class ConstructURIHelper {
 			}
 			
 			result += PROTOCOL;
-			result += source; // This should be the perfSONAR IP
+			//result += source; // This should be the perfSONAR IP
+			result += "147.72.248.7";
 			result += baseUri;
 			result += THROUGHPUT_PART;
 			result += TIME_RANGE_PART + Constants.TIME_IN_HOURS + Constants.AMPERSEND;
