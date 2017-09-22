@@ -38,6 +38,7 @@ public class V1Controller {
 	 * Server check up test
 	 */
 	@RequestMapping(value = "/isUp", method = RequestMethod.GET, produces = "application/json")
+	@ResponseBody
 	public String test() {
 		return "The server is up";
 	}
