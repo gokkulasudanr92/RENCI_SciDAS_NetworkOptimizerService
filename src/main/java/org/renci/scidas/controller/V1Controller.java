@@ -35,6 +35,14 @@ public class V1Controller {
 	public NetworkOptimizerServiceProcessor networkOptimizerServiceProcessor;
 	
 	/**
+	 * Server check up test
+	 */
+	@RequestMapping(value = "/isUp", method = RequestMethod.GET, produces = "application/json")
+	public String test() {
+		return "The server is up";
+	}
+	
+	/**
 	 * Controller call for micro service API (JSON)
 	 * @param request
 	 * @return
