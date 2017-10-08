@@ -11,6 +11,8 @@ import org.renci.scidas.pojo.DataSetAndOffersForProtobuf;
 import org.renci.scidas.pojo.DataSetAndOffersRequest;
 import org.renci.scidas.pojo.OfferRankPOJO;
 import org.renci.scidas.pojo.OfferRankPOJOForProtobuf;
+import org.renci.scidas.pojo.RefinedRequest;
+import org.renci.scidas.pojo.RequestObject;
 import org.renci.scidas.processor.NetworkOptimizerServiceProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -64,6 +66,21 @@ public class V1Controller {
 		return result;
 	}
 	
+	@RequestMapping(value = "/microserviceUpdate", method = RequestMethod.POST, 
+			consumes = "application/json", produces = "application/json")
+	@ResponseBody
+	public OfferRankPOJO microServiceAPIUpdate(@RequestBody RequestObject request) {
+		LOG.info("Micro Service API POST Call for network optimization");
+		OfferRankPOJO result = null;
+		try {
+			RefinedRequest input = requestBodyParserHelper.convertRequestObjectToPOJO(request);
+			result = networkOptimizerServiceProcessor.microServiceProcessorUpdate(input);
+		} catch (Exception e) {
+			LOG.error("Exception while ");
+		}
+		return result;
+	}
+	
 	/**
 	 * Controller call for micro service API (Protobuf)
 	 * @param event
@@ -71,6 +88,7 @@ public class V1Controller {
 	 */
 	@RequestMapping(value = "/microserviceforprotobuf", method = RequestMethod.POST,
 			consumes = "application/x-protobuf", produces = "application/x-protobuf")
+	@ResponseBody
 	public Event microServiceAPIForProtobuf(@RequestBody Event event) {
 		LOG.info("Micro Service API POST Calll for network optimization");
 		try {

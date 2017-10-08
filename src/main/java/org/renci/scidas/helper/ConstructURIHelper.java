@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Configuration;
 public class ConstructURIHelper {
 	
 	public static final Logger LOG = Logger.getLogger(ConstructURIHelper.class);
+	// PerfSONAR Part
 	public static final String PROTOCOL = "http://";
 	public static final String ARCHIVE_PART = "/esmond/perfsonar/archive/?";
 	public static final String SOURCE_PART = "source=";
@@ -18,6 +19,14 @@ public class ConstructURIHelper {
 	public static final String THROUGHPUT_PART = "throughput/base?";
 	public static final String TIME_RANGE_PART = "time-range=";
 	public static final String START_TIME_PART = "time-start=";
+	// iRODS Part
+	public static final String IRODS_ENDPOINT = "http://scidas-dev.renci.org:8080/v1/";
+	public static final String GET_LOGICAL_LOCATION = "getLogicalLocation?";
+	public static final String FILE_NAME = "filename=";
+	public static final String GET_LOGICAL_LOCATION_ENDPART = "&match_exact=true&include_trash=false";
+	public static final String GET_REPLICAS = "getReplicas?";
+	public static final String GET_HOST_NODE = "getHostNode?";
+	public static final String RESOURCE_NAME = "resource_name=";
 	
 	/**
 	 * Method to construct the URI to make the call to perfSONAR
@@ -40,8 +49,7 @@ public class ConstructURIHelper {
 			}
 			
 			result += PROTOCOL;
-			//result += source; // This should be the perfSONAR IP
-			result += "147.72.248.7";
+			result += source; // This should be the perfSONAR IP
 			result += ARCHIVE_PART;
 			result += SOURCE_PART + source + Constants.AMPERSEND;
 			result += DESTINATION_PART + destination + Constants.AMPERSEND;
@@ -84,6 +92,53 @@ public class ConstructURIHelper {
 			result += START_TIME_PART + startTime;
 		} catch (Exception e) {
 			LOG.error("Exception while constructing perfSONAR base uri for obtaining throughput data", e);
+		}
+		return result;
+	}
+	
+	
+	public String constructLogicalLocationURI(String filename) {
+		LOG.info("Method to construct the Logical Location URI for the given file name");
+		String result = null;
+		try {
+			if (filename.isEmpty() || filename == null) {
+				throw new Exception("File Name is Missing");
+			}
+			result = IRODS_ENDPOINT + GET_LOGICAL_LOCATION + FILE_NAME;
+			result += filename;
+			result += GET_LOGICAL_LOCATION_ENDPART;
+		} catch (Exception e) {
+			LOG.error("Exception while constructing the Logical Location URI", e);
+		}
+		return result;
+	}
+	
+	public String constructGetReplicasURI(String path) {
+		LOG.info("Method to construct the get replicas URI for the given file path");
+		String result = null;
+		try {
+			if (path.isEmpty() || path == null) {
+				throw new Exception("Path is missing");
+			}
+			result = IRODS_ENDPOINT + GET_REPLICAS + FILE_NAME;
+			result += path;
+		} catch (Exception e) {
+			LOG.error("Exception while constructing the Get Replicas URI", e);
+		}
+		return result;
+	}
+	
+	public String constructGetHostNodeURI(String resource) {
+		LOG.info("Method to construct the get host node URI for the given reource name");
+		String result = null;
+		try {
+			if (resource.isEmpty() || resource == null) {
+				throw new Exception("Missing Resource Name from IRods");
+			}
+			result = IRODS_ENDPOINT + GET_HOST_NODE + RESOURCE_NAME;
+			result += resource;
+		} catch (Exception e) {
+			LOG.error("Exception while constructing the Get Host Node URI", e);
 		}
 		return result;
 	}

@@ -10,13 +10,19 @@ import org.apache.log4j.Logger;
 import org.apache.mesos.v1.Protos.Offer;
 import org.apache.mesos.v1.scheduler.Protos.Event;
 import org.apache.mesos.v1.scheduler.Protos.Event.Offers;
+import org.renci.scidas.consumer.IRODSConsumer;
 import org.renci.scidas.consumer.PerfSONARRestConsumer;
 import org.renci.scidas.helper.ConstructURIHelper;
 import org.renci.scidas.pojo.DataSetAndOffers;
 import org.renci.scidas.pojo.DataSetAndOffersForProtobuf;
 import org.renci.scidas.pojo.DestinationObject;
+import org.renci.scidas.pojo.IRODSFileName;
+import org.renci.scidas.pojo.IRODSHostNode;
+import org.renci.scidas.pojo.IRODSReplicas;
 import org.renci.scidas.pojo.OfferRankPOJO;
 import org.renci.scidas.pojo.OfferRankPOJOForProtobuf;
+import org.renci.scidas.pojo.RefinedRequest;
+import org.renci.scidas.pojo.Replicas;
 import org.renci.scidas.pojo.ThroughputDataJSON;
 import org.renci.scidas.pojo.ThroughputDataPOJO;
 import org.renci.scidas.pojo.ThroughputEvent;
@@ -33,6 +39,10 @@ public class NetworkOptimizerServiceProcessor {
 	@Autowired
 	@Qualifier("PerfSONARRestConsumer")
 	public PerfSONARRestConsumer perfsonarConsumer;
+	
+	@Autowired
+	@Qualifier("IRODSConsumer")
+	public IRODSConsumer irodsConsumer;
 
 	@Autowired
 	@Qualifier("ConstructURIHelper")
@@ -50,6 +60,61 @@ public class NetworkOptimizerServiceProcessor {
 			List<String> listOfSourcesAsString = data.getSources();
 			List<String> listOfDestinationsAsString = data.getDestinations();
 
+			if (listOfSourcesAsString == null || listOfDestinationsAsString == null) {
+				throw new RuntimeException("Either source list or destination list is null or empty");
+			}
+
+			if (listOfSourcesAsString.size() == 0 || listOfDestinationsAsString.size() == 0) {
+				throw new RuntimeException("Either source list or destination list is null or empty");
+			}
+
+			if (listOfSourcesAsString.size() == 1) {
+				// Single Data Site to multiple Offers
+				result = singleDataSiteLogic(listOfSourcesAsString, listOfDestinationsAsString);
+			} else {
+				// Multiple Data Sites to multiple Offers
+			}
+
+			if (result == null) {
+				throw new RuntimeException("The processing failed to obtain data from perfSONAR");
+			}
+		} catch (Exception e) {
+			LOG.error("Exception while processing for the microservice", e);
+		}
+		return result;
+	}
+	
+	public OfferRankPOJO microServiceProcessorUpdate(RefinedRequest input) {
+		LOG.info("Processing Data Set and Offers...");
+		OfferRankPOJO result = null;
+		try {
+			List<String> listOfSourcesAsString = input.getSource();
+			List<String> listOfDestinationsAsString = null;
+			
+			// Obtaining the end points for the Data Sets
+			for (String file: input.getData()) {
+				IRODSFileName list = irodsConsumer.getLogicalLocation(file);
+				List<String> resources = new ArrayList<String>();
+				for (String f: list.getIrodsFilenames()) {
+					IRODSReplicas data = irodsConsumer.getReplicas(f);
+					for (Replicas replica: data.getReplicas()) {
+						if (!resources.contains(replica.getResourceName())) {
+							resources.add(replica.getResourceName());
+						}
+					}
+				}
+				
+				listOfDestinationsAsString = new ArrayList<String>();
+				for (String resource: resources) {
+					IRODSHostNode node = irodsConsumer.getHostNode(resource);
+					for (String destination: node.getHostnode()) {
+						if (!listOfDestinationsAsString.contains(destination)) {
+							listOfDestinationsAsString.add(destination);
+						}
+					}
+				}
+			}
+			
 			if (listOfSourcesAsString == null || listOfDestinationsAsString == null) {
 				throw new RuntimeException("Either source list or destination list is null or empty");
 			}

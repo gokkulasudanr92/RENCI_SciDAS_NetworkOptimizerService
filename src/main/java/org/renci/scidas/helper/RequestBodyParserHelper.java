@@ -13,6 +13,8 @@ import org.renci.scidas.pojo.DataSetAndOffers;
 import org.renci.scidas.pojo.DataSetAndOffersForProtobuf;
 import org.renci.scidas.pojo.DataSetAndOffersRequest;
 import org.renci.scidas.pojo.DestinationObject;
+import org.renci.scidas.pojo.RefinedRequest;
+import org.renci.scidas.pojo.RequestObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
@@ -58,6 +60,69 @@ public class RequestBodyParserHelper {
 			}
 		} catch (Exception e) {
 			LOG.error("Exception while converting the Data Set Request to POJO", e);
+		}
+		return result;
+	}
+	
+	public RefinedRequest convertRequestObjectToPOJO(RequestObject request) {
+		LOG.info("Method to convert the request object to a refined request");
+		RefinedRequest result = null;
+		try {
+			result = new RefinedRequest();
+			// Master is assumed to be comma separated for multiple masters
+			if (request.getMaster().contains(Constants.COMMA)) {
+				List<String> listOfSources = Arrays.asList(request.getMaster().split(Constants.COMMA));
+				List<String> list = new ArrayList<String>();
+				for (String data: listOfSources) {
+					if (data.contains(Constants.COLON)) {
+						String temp = data.split(Constants.COLON)[0];
+						if (!list.contains(temp)) {
+							list.add(temp);
+						}
+					} else {
+						if (!list.contains(data)) {
+							list.add(data);
+						}
+					}
+				}
+				result.setSource(list);
+			} else if (request.getMaster().length() == 0) {
+				throw new Exception("Missing Master IP input");
+			} else {
+				List<String> listOfSources = Arrays.asList(request.getMaster());
+				List<String> list = new ArrayList<String>();
+				for (String data: listOfSources) {
+					if (data.contains(Constants.COLON)) {
+						String temp = data.split(Constants.COLON)[0];
+						if (!list.contains(temp)) {
+							list.add(temp);
+						}
+					} else {
+						if (!list.contains(data)) {
+							list.add(data);
+						}
+					}
+				}
+				result.setSource(list);
+			}
+			
+			if (!request.getAgent().isEmpty() && request.getAgent() != null) {
+				if (request.getAgent().contains(Constants.COLON)) {
+					result.setAgent(request.getAgent().split(Constants.COLON)[0]);
+				} else {
+					result.setAgent(request.getAgent());
+				}
+			} else {
+				throw new Exception("Missing Agent IP input");
+			}
+			
+			if (!request.getData().isEmpty() && request.getData() != null) {
+				result.setData(request.getData());
+			} else {
+				throw new Exception("Missing Data Set input");
+			}
+		} catch (Exception e) {
+			LOG.error("Exception while converting the Request Object to POJO", e);
 		}
 		return result;
 	}
