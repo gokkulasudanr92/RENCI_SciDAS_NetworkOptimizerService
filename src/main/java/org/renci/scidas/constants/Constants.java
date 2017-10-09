@@ -9,5 +9,5 @@ public class Constants {
 	
 	// Integers
 	public static final Integer TIME_IN_HOURS = 86400;
-	public static final Long TIME_FOR_ONE_HOUR = 3600L;
+	public static final Long TIME_FOR_TWO_HOUR =7200L;
 }
