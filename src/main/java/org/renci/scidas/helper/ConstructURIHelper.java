@@ -82,14 +82,14 @@ public class ConstructURIHelper {
 			}
 			
 			result += PROTOCOL;
-			//result += source; // This should be the perfSONAR IP
-			result += "147.72.248.7";
+			result += source; // This should be the perfSONAR IP
 			result += baseUri;
 			result += THROUGHPUT_PART;
 			result += TIME_RANGE_PART + Constants.TIME_IN_HOURS + Constants.AMPERSEND;
 			Long currentTime = System.currentTimeMillis() / 1000L;
 			Long startTime = currentTime - Constants.TIME_FOR_ONE_HOUR;
 			result += START_TIME_PART + startTime;
+			System.out.println(result);
 		} catch (Exception e) {
 			LOG.error("Exception while constructing perfSONAR base uri for obtaining throughput data", e);
 		}
