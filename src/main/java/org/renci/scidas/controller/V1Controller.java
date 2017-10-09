@@ -1,18 +1,15 @@
 package org.renci.scidas.controller;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.Produces;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.apache.mesos.v1.scheduler.Protos.Event;
 import org.renci.scidas.helper.RequestBodyParserHelper;
-import org.renci.scidas.pojo.DataSetAndOffers;
 import org.renci.scidas.pojo.DataSetAndOffersForProtobuf;
-import org.renci.scidas.pojo.DataSetAndOffersRequest;
-import org.renci.scidas.pojo.OfferRankPOJO;
+import org.renci.scidas.pojo.OfferRank;
 import org.renci.scidas.pojo.OfferRankPOJOForProtobuf;
 import org.renci.scidas.pojo.RefinedRequest;
-import org.renci.scidas.pojo.RequestObject;
+import org.renci.scidas.pojo.RequestJSON;
 import org.renci.scidas.processor.NetworkOptimizerServiceProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -46,35 +43,19 @@ public class V1Controller {
 	}
 	
 	/**
-	 * Controller call for micro service API (JSON)
+	 * Controller call for micro service API (for IRODS)
 	 * @param request
 	 * @return
 	 */
-	@RequestMapping(value = "/microservice", method = RequestMethod.POST)
-	@Consumes("application/json")
-	@Produces("application/json")
-	@ResponseBody
-	public OfferRankPOJO microServiceAPI(@RequestBody DataSetAndOffersRequest request) {
-		LOG.info("Micro Service API POST Call for network optimization");
-		OfferRankPOJO result = null;
-		try {
-			DataSetAndOffers refinedRequest = requestBodyParserHelper.convertDataSetAndOffersRequestToPOJO(request);
-			result = networkOptimizerServiceProcessor.microServiceProcessor(refinedRequest);
-		} catch (Exception e) {
-			LOG.error("Exception while Micro Service API POST Call for network optimization", e);
-		}
-		return result;
-	}
-	
-	@RequestMapping(value = "/microserviceUpdate", method = RequestMethod.POST, 
+	@RequestMapping(value = "/microservice", method = RequestMethod.POST, 
 			consumes = "application/json", produces = "application/json")
 	@ResponseBody
-	public OfferRankPOJO microServiceAPIUpdate(@RequestBody RequestObject request) {
+	public OfferRank microServiceAPIUpdate(@RequestBody RequestJSON request) {
 		LOG.info("Micro Service API POST Call for network optimization");
-		OfferRankPOJO result = null;
+		OfferRank result = null;
 		try {
-			RefinedRequest input = requestBodyParserHelper.convertRequestObjectToPOJO(request);
-			result = networkOptimizerServiceProcessor.microServiceProcessorUpdate(input);
+			List<RefinedRequest> input = requestBodyParserHelper.convertRequestJSONtoRefinedRequest(request);
+			result = networkOptimizerServiceProcessor.microServiceUpdate(input);
 		} catch (Exception e) {
 			LOG.error("Exception while ");
 		}

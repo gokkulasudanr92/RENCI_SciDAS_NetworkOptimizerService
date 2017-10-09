@@ -1,7 +1,5 @@
 package org.renci.scidas.pojo;
 
-import java.util.List;
-
 public class RequestObject {
 	private String master;
 	private String agent;
@@ -10,7 +8,6 @@ public class RequestObject {
 	private Double cpus;
 	private String agentId;
 	private String ports;
-	private List<String> data;
 	
 	public String getMaster() {
 		return master;
@@ -66,14 +63,6 @@ public class RequestObject {
 	
 	public void setPorts(String ports) {
 		this.ports = ports;
-	}
-
-	public List<String> getData() {
-		return data;
-	}
-
-	public void setData(List<String> data) {
-		this.data = data;
 	}
 	
 }

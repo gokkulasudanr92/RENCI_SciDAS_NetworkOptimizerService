@@ -13,16 +13,16 @@ import org.apache.mesos.v1.scheduler.Protos.Event.Offers;
 import org.renci.scidas.consumer.IRODSConsumer;
 import org.renci.scidas.consumer.PerfSONARRestConsumer;
 import org.renci.scidas.helper.ConstructURIHelper;
-import org.renci.scidas.pojo.DataSetAndOffers;
 import org.renci.scidas.pojo.DataSetAndOffersForProtobuf;
 import org.renci.scidas.pojo.DestinationObject;
 import org.renci.scidas.pojo.IRODSFileName;
 import org.renci.scidas.pojo.IRODSHostNode;
 import org.renci.scidas.pojo.IRODSReplicas;
-import org.renci.scidas.pojo.OfferRankPOJO;
+import org.renci.scidas.pojo.OfferRank;
 import org.renci.scidas.pojo.OfferRankPOJOForProtobuf;
 import org.renci.scidas.pojo.RefinedRequest;
 import org.renci.scidas.pojo.Replicas;
+import org.renci.scidas.pojo.RequestObject;
 import org.renci.scidas.pojo.ThroughputDataJSON;
 import org.renci.scidas.pojo.ThroughputDataPOJO;
 import org.renci.scidas.pojo.ThroughputEvent;
@@ -49,51 +49,23 @@ public class NetworkOptimizerServiceProcessor {
 	public ConstructURIHelper constructURIHelper;
 
 	/**
-	 * Method to rank the offers for the data set
-	 * @param data
-	 * @return
-	 */
-	public OfferRankPOJO microServiceProcessor(DataSetAndOffers data) {
+	* Method to rank the offers for the data set
+	* @param data
+	* @return
+	*/
+	public OfferRank microServiceUpdate(List<RefinedRequest> input) {
 		LOG.info("Processing Data Set and Offers...");
-		OfferRankPOJO result = null;
+		OfferRank result = null;
 		try {
-			List<String> listOfSourcesAsString = data.getSources();
-			List<String> listOfDestinationsAsString = data.getDestinations();
-
-			if (listOfSourcesAsString == null || listOfDestinationsAsString == null) {
-				throw new RuntimeException("Either source list or destination list is null or empty");
-			}
-
-			if (listOfSourcesAsString.size() == 0 || listOfDestinationsAsString.size() == 0) {
-				throw new RuntimeException("Either source list or destination list is null or empty");
-			}
-
-			if (listOfSourcesAsString.size() == 1) {
-				// Single Data Site to multiple Offers
-				result = singleDataSiteLogic(listOfSourcesAsString, listOfDestinationsAsString);
-			} else {
-				// Multiple Data Sites to multiple Offers
-			}
-
-			if (result == null) {
-				throw new RuntimeException("The processing failed to obtain data from perfSONAR");
-			}
-		} catch (Exception e) {
-			LOG.error("Exception while processing for the microservice", e);
-		}
-		return result;
-	}
-	
-	public OfferRankPOJO microServiceProcessorUpdate(RefinedRequest input) {
-		LOG.info("Processing Data Set and Offers...");
-		OfferRankPOJO result = null;
-		try {
-			List<String> listOfSourcesAsString = input.getSource();
-			List<String> listOfDestinationsAsString = null;
+			result = new OfferRank();
+			result.setOffers(new ArrayList<RequestObject>());
+			result.setData(input.get(0).getData());
 			
-			// Obtaining the end points for the Data Sets
-			for (String file: input.getData()) {
+			List<String> files = input.get(0).getData();
+			HashMap<String, List<String>> map = new HashMap<String, List<String>>();
+			for (String file: files) {
 				IRODSFileName list = irodsConsumer.getLogicalLocation(file);
+				
 				List<String> resources = new ArrayList<String>();
 				for (String f: list.getIrodsFilenames()) {
 					IRODSReplicas data = irodsConsumer.getReplicas(f);
@@ -104,122 +76,85 @@ public class NetworkOptimizerServiceProcessor {
 					}
 				}
 				
-				listOfDestinationsAsString = new ArrayList<String>();
+				List<String> destinations = new ArrayList<String>();
 				for (String resource: resources) {
 					IRODSHostNode node = irodsConsumer.getHostNode(resource);
 					for (String destination: node.getHostnode()) {
-						if (!listOfDestinationsAsString.contains(destination)) {
-							listOfDestinationsAsString.add(destination);
+						if (!destinations.contains(destination)) {
+							destinations.add(destination);
 						}
 					}
 				}
+				map.put(file, destinations);
 			}
 			
-			if (listOfSourcesAsString == null || listOfDestinationsAsString == null) {
-				throw new RuntimeException("Either source list or destination list is null or empty");
+			for (RefinedRequest obj: input) {
+				obj.setDataNodeMap(map);
 			}
-
-			if (listOfSourcesAsString.size() == 0 || listOfDestinationsAsString.size() == 0) {
-				throw new RuntimeException("Either source list or destination list is null or empty");
-			}
-
-			if (listOfSourcesAsString.size() == 1) {
-				// Single Data Site to multiple Offers
-				result = singleDataSiteLogic(listOfSourcesAsString, listOfDestinationsAsString);
+			
+			boolean check = true;
+			if (map.size() == 1) {
+				for (String key: map.keySet()) {
+					List<String> list = map.get(key);
+					if (list.size() != 1) {
+						check = false;
+						break;
+					}
+				}
 			} else {
-				// Multiple Data Sites to multiple Offers
+				check = false;
 			}
-
-			if (result == null) {
-				throw new RuntimeException("The processing failed to obtain data from perfSONAR");
+			
+			if (check) {
+				// Single Data Source
+				singleDataSiteLogicUpdate(result, input);
+			} else {
+				// Multiple Data Source
+			}
+			
+			// Sort the Input data in descending order
+			Collections.sort(input);
+			for (RefinedRequest obj: input) {
+				result.getOffers().add(obj.getOffer());
 			}
 		} catch (Exception e) {
 			LOG.error("Exception while processing for the microservice", e);
 		}
 		return result;
 	}
-
-	/**
-	 * Method to rank for Single Data Set Logic
-	 * @param listOfSourcesAsString
-	 * @param listOfDestinationsAsString
-	 * @return
-	 */
-	public OfferRankPOJO singleDataSiteLogic(List<String> listOfSourcesAsString,
-			List<String> listOfDestinationsAsString) {
+	
+	public void singleDataSiteLogicUpdate(OfferRank result, List<RefinedRequest> input) {
 		LOG.info("Method to execute Single Data Site Logic Algorithm");
-		OfferRankPOJO result = null;
 		try {
-			Map<String, String> mapOfSources = new HashMap<String, String>();
-			for (String source : listOfSourcesAsString) {
-				mapOfSources.put(source, source);
-			}
-
-			Map<String, String> mapOfDestinations = new HashMap<String, String>();
-			for (String destination : listOfDestinationsAsString) {
-				mapOfDestinations.put(destination, destination);
-			}
-
-			result = new OfferRankPOJO();
-			for (String source : mapOfSources.keySet()) {
-				result.setSourceDataSite(source);
-				result.setOffers(new ArrayList<ThroughputDataPOJO>());
-
-				for (String destination : mapOfDestinations.keySet()) {
-					String uriToConsumeForThroughputEvent = constructURIHelper.constructPerfSONARUriForThroughputEvent(
-							mapOfSources.get(source), mapOfDestinations.get(destination));
-
-					// Consume the PerfSONAR REST API to abstract Base URIs
-					ThroughputEvent event = perfsonarConsumer.getURIFromThroughput(uriToConsumeForThroughputEvent);
-
-					// Get the latest network throughput result for the base-uri
-					// from perfSONAR
-					String uriToConsumeForThroughputData = constructURIHelper
-							.constructPerfSONARUriForThroughputData(mapOfSources.get(source), event.getUri());
-					List<ThroughputDataJSON> throughputDataList = perfsonarConsumer
-							.getURIForThroughputData(uriToConsumeForThroughputData);
-					ThroughputDataPOJO data = this.convertToThroughputDataPOJO(destination, mapOfDestinations,
-							throughputDataList.get(throughputDataList.size() - 1));
-
-					// Add the result to the response Object list
-					System.out.println("The current time stamp is: "
-							+ throughputDataList.get(throughputDataList.size() - 1).getTs());
-					result.getOffers().add(data);
+			for (RefinedRequest obj: input) {
+				String source = obj.getSource();
+				String destination = "";
+				for (String key: obj.getDataNodeMap().keySet()) {
+					destination = obj.getDataNodeMap().get(key).get(0);
 				}
+				
+				String uriToConsumeForThroughputEvent = constructURIHelper.
+						constructPerfSONARUriForThroughputEvent(source, destination);
+				
+				// Consume the PerfSONAR REST API to abstract Base URIs
+				ThroughputEvent event = perfsonarConsumer.
+						getURIFromThroughput(uriToConsumeForThroughputEvent);
+				
+				if (event == null) {
+					result.setStatus(false);
+				}
+				// Get the latest network throughput result for the base-uri
+				// from perfSONAR
+				String uriToConsumeForThroughputData = constructURIHelper
+						.constructPerfSONARUriForThroughputData(source, event.getUri());
+				List<ThroughputDataJSON> throughputDataList = perfsonarConsumer
+						.getURIForThroughputData(uriToConsumeForThroughputData);
+				
+				obj.setThroughput(throughputDataList.get(throughputDataList.size() - 1).getVal());
 			}
-
-			Collections.sort(result.getOffers());
 		} catch (Exception e) {
 			LOG.error("Exception while executing single data site logic algorithm", e);
 		}
-		return result;
-	}
-
-	/**
-	 * Convert the result to ThroughputDataPOJO
-	 * @param destination
-	 * @param mapOfDestinations
-	 * @param data
-	 * @return
-	 */
-	public ThroughputDataPOJO convertToThroughputDataPOJO(String destination, Map<String, String> mapOfDestinations,
-			ThroughputDataJSON data) {
-		LOG.info("Method to convert Object to ThroughputData POJO");
-		ThroughputDataPOJO result;
-		try {
-			if (data == null) {
-				throw new RuntimeException("Failed to get data from perfSONAR REST Consumer");
-			}
-
-			result = new ThroughputDataPOJO();
-			result.setDestination(mapOfDestinations.get(destination));
-			result.setOffer(destination);
-			result.setValue(data.getVal());
-		} catch (Exception e) {
-			LOG.error("Exception while converting Object to ThroughputData POJO", e);
-			result = new ThroughputDataPOJO();
-		}
-		return result;
 	}
 	
 	/**
