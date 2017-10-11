@@ -10,6 +10,7 @@ import org.apache.log4j.Logger;
 import org.apache.mesos.v1.Protos.Offer;
 import org.apache.mesos.v1.scheduler.Protos.Event;
 import org.apache.mesos.v1.scheduler.Protos.Event.Offers;
+import org.renci.scidas.config.MapConfig;
 import org.renci.scidas.consumer.IRODSConsumer;
 import org.renci.scidas.consumer.PerfSONARRestConsumer;
 import org.renci.scidas.helper.ConstructURIHelper;
@@ -47,6 +48,10 @@ public class NetworkOptimizerServiceProcessor {
 	@Autowired
 	@Qualifier("ConstructURIHelper")
 	public ConstructURIHelper constructURIHelper;
+	
+	@Autowired
+	@Qualifier("MapConfig")
+	public MapConfig mapConfig;
 
 	/**
 	* Method to rank the offers for the data set
@@ -127,7 +132,8 @@ public class NetworkOptimizerServiceProcessor {
 		LOG.info("Method to execute Single Data Site Logic Algorithm");
 		try {
 			for (RefinedRequest obj: input) {
-				String source = obj.getSource();
+				String master = obj.getSource();
+				String source = mapConfig.getMasterPerfSONARMap().get(master);
 				String destination = "";
 				for (String key: obj.getDataNodeMap().keySet()) {
 					destination = obj.getDataNodeMap().get(key).get(0);

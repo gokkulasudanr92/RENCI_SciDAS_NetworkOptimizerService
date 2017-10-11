@@ -27,11 +27,11 @@ public class V1Controller {
 	
 	@Autowired
 	@Qualifier("RequestBodyParserHelper")
-	public RequestBodyParserHelper requestBodyParserHelper;
+	RequestBodyParserHelper requestBodyParserHelper;
 	
 	@Autowired
 	@Qualifier("NetworkOptimizerServiceProcessor")
-	public NetworkOptimizerServiceProcessor networkOptimizerServiceProcessor;
+	NetworkOptimizerServiceProcessor networkOptimizerServiceProcessor;
 	
 	/**
 	 * Server check up test

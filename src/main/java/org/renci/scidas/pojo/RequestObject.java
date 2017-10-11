@@ -8,7 +8,16 @@ public class RequestObject {
 	private Double cpus;
 	private String agentId;
 	private String ports;
+	private String marathon;
 	
+	public String getMarathon() {
+		return marathon;
+	}
+
+	public void setMarathon(String marathon) {
+		this.marathon = marathon;
+	}
+
 	public String getMaster() {
 		return master;
 	}

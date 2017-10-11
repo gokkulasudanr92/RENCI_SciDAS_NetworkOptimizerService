@@ -17,13 +17,13 @@ public class PropertyHelper {
 	 * which is used in Shell Consumer
 	 * @return
 	 */
-	public File getKeyFile() {
+	public File getConfFile() {
 		File result = null;
-		LOG.info("Get the private key information from resource folder");
+		LOG.info("Get the mapping configuration file from resource folder");
 		try {
 			// Get file from resources folder
 			ClassLoader loader = getClass().getClassLoader();
-			result = new File(loader.getResource("properties/keys/id_rsa").getFile());
+			result = new File(loader.getResource("conf/perfSONAR.conf").getFile());
 		} catch (Exception e) {
 			LOG.error("Exception while accessing resource folder for private key", e);
 		}
