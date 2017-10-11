@@ -1,5 +1,7 @@
 package org.renci.scidas.pojo;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class RequestObject {
 	private String master;
 	private String agent;
@@ -8,14 +10,16 @@ public class RequestObject {
 	private Double cpus;
 	private String agentId;
 	private String ports;
-	private String marathon;
+	private String Marathon;
 	
+	@JsonProperty("Marathon")
 	public String getMarathon() {
-		return marathon;
+		return Marathon;
 	}
 
+	@JsonProperty("Marathon")
 	public void setMarathon(String marathon) {
-		this.marathon = marathon;
+		this.Marathon = marathon;
 	}
 
 	public String getMaster() {
