@@ -14,6 +14,7 @@ import org.renci.scidas.config.MapConfig;
 import org.renci.scidas.consumer.IRODSConsumer;
 import org.renci.scidas.consumer.PerfSONARRestConsumer;
 import org.renci.scidas.helper.ConstructURIHelper;
+import org.renci.scidas.model.Test;
 import org.renci.scidas.pojo.DataSetAndOffersForProtobuf;
 import org.renci.scidas.pojo.DestinationObject;
 import org.renci.scidas.pojo.IRODSFileName;
@@ -27,11 +28,12 @@ import org.renci.scidas.pojo.RequestObject;
 import org.renci.scidas.pojo.ThroughputDataJSON;
 import org.renci.scidas.pojo.ThroughputDataPOJO;
 import org.renci.scidas.pojo.ThroughputEvent;
+import org.renci.scidas.service.TestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Service;
 
-@Configuration
+@Service
 @Qualifier("NetworkOptimizerServiceProcessor")
 public class NetworkOptimizerServiceProcessor {
 
@@ -52,6 +54,10 @@ public class NetworkOptimizerServiceProcessor {
 	@Autowired
 	@Qualifier("MapConfig")
 	public MapConfig mapConfig;
+	
+	@Autowired
+	@Qualifier("TestServiceImpl")
+	public TestService testService;
 
 	/**
 	* Method to rank the offers for the data set
@@ -302,6 +308,25 @@ public class NetworkOptimizerServiceProcessor {
 		} catch (Exception e) {
 			LOG.error("Exception while arranging objects within the Event Object");
 		}
+	}
+	
+	public void addTest1() {
+		Test t = new Test();
+		t.setName("Trial1");
+		t.setAge(20);
+		testService.addTest(t);
+	}
+	
+	public void addTest2() {
+		Test t = new Test();
+		t.setName("Trial2");
+		t.setAge(23);
+		testService.addTest(t);
+	}
+	
+	public List<Test> listTest() {
+		List<Test> result = testService.listTest();
+		return result;
 	}
 
 }
