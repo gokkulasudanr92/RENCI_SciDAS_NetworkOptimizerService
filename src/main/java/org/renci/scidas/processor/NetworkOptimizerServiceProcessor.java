@@ -14,7 +14,7 @@ import org.renci.scidas.config.MapConfig;
 import org.renci.scidas.consumer.IRODSConsumer;
 import org.renci.scidas.consumer.PerfSONARRestConsumer;
 import org.renci.scidas.helper.ConstructURIHelper;
-import org.renci.scidas.model.Test;
+import org.renci.scidas.model.MetricsTable;
 import org.renci.scidas.pojo.DataSetAndOffersForProtobuf;
 import org.renci.scidas.pojo.DestinationObject;
 import org.renci.scidas.pojo.IRODSFileName;
@@ -28,12 +28,13 @@ import org.renci.scidas.pojo.RequestObject;
 import org.renci.scidas.pojo.ThroughputDataJSON;
 import org.renci.scidas.pojo.ThroughputDataPOJO;
 import org.renci.scidas.pojo.ThroughputEvent;
-import org.renci.scidas.service.TestService;
+import org.renci.scidas.service.MetricsTableService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Service;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Component;
 
-@Service
+@Component
 @Qualifier("NetworkOptimizerServiceProcessor")
 public class NetworkOptimizerServiceProcessor {
 
@@ -56,8 +57,8 @@ public class NetworkOptimizerServiceProcessor {
 	public MapConfig mapConfig;
 	
 	@Autowired
-	@Qualifier("TestServiceImpl")
-	public TestService testService;
+	@Qualifier("MetricsTableServiceImpl")
+	public MetricsTableService metricsTableService;
 
 	/**
 	* Method to rank the offers for the data set
@@ -163,6 +164,12 @@ public class NetworkOptimizerServiceProcessor {
 						.getURIForThroughputData(uriToConsumeForThroughputData);
 				
 				obj.setThroughput(throughputDataList.get(throughputDataList.size() - 1).getVal());
+				MetricsTable newEntry = new MetricsTable();
+				newEntry.setSource(source);
+				newEntry.setDestination(destination);
+				newEntry.setThroughput(throughputDataList.get(throughputDataList.size() - 1).getVal());
+				newEntry.setUpdatedTime(throughputDataList.get(throughputDataList.size() - 1).getTs());
+				this.addEntry(newEntry);
 			}
 		} catch (Exception e) {
 			LOG.error("Exception while executing single data site logic algorithm", e);
@@ -249,6 +256,13 @@ public class NetworkOptimizerServiceProcessor {
 
 					// Add the result to the response Object list
 					result.getOffers().add(data);
+					
+					MetricsTable newEntry = new MetricsTable();
+					newEntry.setSource(source);
+					newEntry.setDestination(destination);
+					newEntry.setThroughput(throughputDataList.get(throughputDataList.size() - 1).getVal());
+					newEntry.setUpdatedTime(throughputDataList.get(throughputDataList.size() - 1).getTs());
+					this.addEntry(newEntry);
 				}
 			}
 
@@ -310,22 +324,25 @@ public class NetworkOptimizerServiceProcessor {
 		}
 	}
 	
-	public void addTest1() {
-		Test t = new Test();
-		t.setName("Trial1");
-		t.setAge(20);
-		testService.addTest(t);
+	@Async
+	public void addEntry(MetricsTable object) {
+		LOG.info("Adding Entry to DB...");
+		try {
+			metricsTableService.addEntry(object);
+		} catch (Exception e) {
+			LOG.error("Exception while adding entry to DB", e);
+		}
 	}
 	
-	public void addTest2() {
-		Test t = new Test();
-		t.setName("Trial2");
-		t.setAge(23);
-		testService.addTest(t);
-	}
-	
-	public List<Test> listTest() {
-		List<Test> result = testService.listTest();
+	public List<MetricsTable> listMetrics() {
+		List<MetricsTable> result;
+		LOG.info("Listing all the entries from DB");
+		try {
+			result = metricsTableService.list();
+		} catch (Exception e) {
+			LOG.error("Exception while listing all th entries from DB", e);
+			result = null;
+		}
 		return result;
 	}
 

@@ -5,7 +5,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.apache.mesos.v1.scheduler.Protos.Event;
 import org.renci.scidas.helper.RequestBodyParserHelper;
-import org.renci.scidas.model.Test;
+import org.renci.scidas.model.MetricsTable;
 import org.renci.scidas.pojo.DataSetAndOffersForProtobuf;
 import org.renci.scidas.pojo.OfferRank;
 import org.renci.scidas.pojo.OfferRankPOJOForProtobuf;
@@ -43,24 +43,16 @@ public class V1Controller {
 		return "The server is up";
 	}
 	
-	@RequestMapping(value = "/addOne", method = RequestMethod.GET, produces = "application/json")
+	@RequestMapping(value = "/listMetrics", method = RequestMethod.GET, produces = "application/json")
 	@ResponseBody
-	public String test1() {
-		networkOptimizerServiceProcessor.addTest1();
-		return "one added";
-	}
-	
-	@RequestMapping(value = "/addTwo", method = RequestMethod.GET, produces = "application/json")
-	@ResponseBody
-	public String test2() {
-		networkOptimizerServiceProcessor.addTest2();
-		return "two added";
-	}
-	
-	@RequestMapping(value = "/list", method = RequestMethod.GET, produces = "application/json")
-	@ResponseBody
-	public List<Test> test3() {
-		List<Test> result = networkOptimizerServiceProcessor.listTest();
+	public List<MetricsTable> listMetrics() {
+		List<MetricsTable> result;
+		try {
+			result = networkOptimizerServiceProcessor.listMetrics();
+		} catch (Exception e) {
+			LOG.error("xceeeption while listing the meetrics data");
+			result = null;
+		}
 		return result;
 	}
 	
